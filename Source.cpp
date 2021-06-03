@@ -15,7 +15,7 @@ int mod ( int a1 ) {
 static float  threshold = 2;
 static bool   labelsActive = true;
 static float  weight [ 11 ] = { 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1 };
-static string parameterNames [ 10 ] = { "RADIUS", "TEXTURE", "PERIMETER", "AREA", "SMOOTHNES", "COMPACTNESS", "CONCAVITY", "CONCAVITY PTS.", "SYMMETRY", "FRACTAL DIM." };
+static string parameterNames [ 9 ] = { "CLUMP THK.", "SIZE UNIF.", "SHAPE UNIF.", "MARGINAL ADH.", "SEC. SIZE", "BARE NCL.", "BLAND CHRM.", "NORMAL NCL.", "MITOSES" };
   
 class DataPoint {
   int actual; 
@@ -24,10 +24,10 @@ class DataPoint {
 
   int data[ 11 ];
 
-  DataPoint() { actual = 0; for ( int i = 0; i < 10; i++ ) { data[ i ] = -1; } }
-  DataPoint( const DataPoint& a1 ) { actual = a1.actual; for( int i = 0; i < 10; i++ ) { data[ i ] = a1.data[ i ]; } }
+  DataPoint() { actual = 0; for ( int i = 0; i < 11; i++ ) { data[ i ] = -1; } }
+  DataPoint( const DataPoint& a1 ) { actual = a1.actual; for( int i = 0; i < 11; i++ ) { data[ i ] = a1.data[ i ]; } }
 
-  void AddDPV( int a1 ) { if( actual > 10 ) { return; } data[ actual ] = a1; actual++; }
+  void AddDPV( int a1 ) { if( actual > 11 ) { return; } data[ actual ] = a1; actual++; }
 
   void Display () {
       for ( int i = 0; i < 11; i ++ ) {
@@ -128,13 +128,15 @@ int main() {
     
     sf::RectangleShape line; 
     sf::Text id;
+    sf::Text cls;
     sf::Text pLabel;
   
-    id.setFont( font ); pLabel.setFont( font );  
-    id.setCharacterSize( 20 ); pLabel.setCharacterSize( 12 );
-    id.move( 10, 10 );
+    id.setFont( font ); cls.setFont( font ); pLabel.setFont( font );
+    id.setCharacterSize( 20 ); cls.setCharacterSize( 20 ); pLabel.setCharacterSize( 12 );
+    id.move( 10, 10 ); cls.move( 10, 30 );
 
     id.setString( "ID : " + to_string ( display[ display.size() - 1 ].data[ 0 ] ) );
+    cls.setString( ( display[ display.size() - 1 ].data[ 11 ] == 2 ? "CLASS : BENIGN" : "CLASS : MALIGNANT" ) );
 
     while ( window.isOpen() ) {
     
@@ -152,18 +154,19 @@ int main() {
       for ( int i = 1, ds = display.size() - 1; i < 11; i++ ) {
         line = sf::RectangleShape( sf::Vector2f( 20, 2.5f ) );
 
-        pLabel.setPosition ( 400 + ( int )( 20 * ( display[ ds ].data[ i ] + 3 ) * cos ( ( 2 * M_PI / 10 ) * i ) ) - 30, 225 + ( int )( 20 * ( display[ ds ].data[ i ] + 3 ) * sin ( ( 2 * M_PI / 10 ) * i ) ) );
+        pLabel.setPosition ( 400 + ( int )( 20 * ( display[ ds ].data[ i ] + 3 ) * cos ( ( 2 * M_PI / 9 ) * i ) ) - 30, 225 + ( int )( 20 * ( display[ ds ].data[ i ] + 3 ) * sin ( ( 2 * M_PI / 9 ) * i ) ) );
         pLabel.setString( parameterNames[ i - 1 ] );
 
         line.move( 400, 225 );
         line.setScale ( display[ ds ].data[ i ] + 1, 1 );
-        line.rotate( 36 * i );
+        line.rotate( 40 * i );
         
         if( labelsActive ) window.draw ( pLabel );
         window.draw ( line );
       }
       
       window.draw( id );
+      window.draw( cls );
       window.display();
     }
 
